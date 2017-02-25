@@ -22,8 +22,8 @@ License: Boost Licence 1.0 (http://boost.org/LICENSE_1_0.txt)
 module tsv_select;
 
 // Imports used by multiple routines. Others imports made in local context.
-import std.stdio;
 import std.typecons : tuple, Tuple;
+import std.stdio: writeln, write, stderr;
 
 // 'Heredoc' style help text. When printed it is followed by a getopt formatted option list.
 auto helpText = q"EOS
@@ -175,6 +175,12 @@ void tsvSelect(CTERestLocation cteRest)(in TsvSelectOptions cmdopt, in string[] 
     import std.algorithm: splitter;
     import std.format: format;
     import std.range;
+    import iopipe.stream;
+    import iopipe.textpipe;
+    import iopipe.bufpipe;
+
+    // for now, just use writeln and write
+    import std.stdio: writeln, write;
 
     // Ensure the correct template instantiation was called. 
     static if (cteRest == CTERestLocation.none)
@@ -204,8 +210,8 @@ void tsvSelect(CTERestLocation cteRest)(in TsvSelectOptions cmdopt, in string[] 
      * interpreted as stdin, common behavior for unix command line tools.
      */
     foreach (fileNum, filename; (inputFiles.length > 0) ? inputFiles : ["-"]) {
-        auto inputStream = (filename == "-") ? stdin : filename.File();
-        foreach (lineNum, line; inputStream.byLine.enumerate(1)) {
+        auto inputStream = (filename == "-") ? new IODevice(0) : new IODevice(filename);
+        foreach (lineNum, line; inputStream.bufferedSource.arrayCastPipe!(char).byLine.asInputRange.enumerate(1)) {
             if (lineNum == 1 && fileNum > 0 && cmdopt.hasHeader)
                 continue;   // Drop the header line from all but the first file.
             static if (cteRest != CTERestLocation.none) 

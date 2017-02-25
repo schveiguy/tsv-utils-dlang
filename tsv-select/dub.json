@@ -14,7 +14,8 @@
             "mainSourceFile": "src/tsv-select.d",
             "excludedSourceFiles": ["src/tsv-select_no-template-version.d"],
             "dependencies": {
-                "tsv-utils-dlang:common": "*"
+                "tsv-utils-dlang:common": "*",
+                "iopipe": "*"
             }
         },
         {
