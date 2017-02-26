@@ -211,7 +211,7 @@ void tsvSelect(CTERestLocation cteRest)(in TsvSelectOptions cmdopt, in string[] 
      */
     foreach (fileNum, filename; (inputFiles.length > 0) ? inputFiles : ["-"]) {
         auto inputStream = (filename == "-") ? new IODevice(0) : new IODevice(filename);
-        foreach (lineNum, line; inputStream.bufferedSource.arrayCastPipe!(char).byLine.asInputRange.enumerate(1)) {
+        foreach (lineNum, line; inputStream.bufferedSource.arrayCastPipe!(char).byLineRange.enumerate(1)) {
             if (lineNum == 1 && fileNum > 0 && cmdopt.hasHeader)
                 continue;   // Drop the header line from all but the first file.
             static if (cteRest != CTERestLocation.none) 
